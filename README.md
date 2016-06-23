@@ -1,4 +1,4 @@
-#Splunk App for Evident.io
+#Evident.io app for Splunk
 
 Splunk Technology Add-on for Evident.io Version 2.0
 
