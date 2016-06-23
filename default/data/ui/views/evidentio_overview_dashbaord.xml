@@ -1,0 +1,92 @@
+<form>
+  <label>Evident.io Overview Dashboard</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time">
+      <label>Time</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="resource_type" searchWhenChanged="true">
+      <label>Resource Type</label>
+      <choice value="*">All</choice>
+      <choice value="vol*">Volume</choice>
+      <choice value="vpc*">VPC</choice>
+      <choice value="i*">Instance</choice>
+      <choice value="acl*">ACL</choice>
+      <choice value="subnet*">Subnet</choice>
+      <choice value="sg*">Security Group</choice>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Severity Breakdown</title>
+      <chart>
+        <title>By Resource</title>
+        <search>
+          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1  | spath input=message.Records{}.Sns.Message|  search data.attributes.resource = "$resource_type$*" |  rename "included{}.attributes.risk_level" as "Severity" | stats count by Severity</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">pie</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">all</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.placement">right</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Resource Breakdown</title>
+      <table>
+        <search>
+          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1   | spath input=message.Records{}.Sns.Message  | rename data.attributes.resource as resource | search resource = "$resource_type$*" | rename included{}.attributes.data.details.attachedEC2Instances{} as Instance | rename included{}.attributes.resolution as Resolution| rename included{}.attributes.data.details.securityGroup.vpcId as VPC | rename included{}.attributes.risk_level as Severity | stats count as "Number of Alerts",values(Instance) as "Associated EC2 Instances" by Severity, resource | sort + Severity</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="charting.chart">bar</option>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Resolution</title>
+      <table>
+        <search>
+          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1    | spath input=message.Records{}.Sns.Message   | rename data.attributes.resource as resource | search resource = $resource_type$ | rename included{}.attributes.resolution as Resolution | table
+ Resolution</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+        <option name="wrap">true</option>
+        <option name="rowNumbers">false</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="count">10</option>
+      </table>
+    </panel>
+  </row>
+</form>

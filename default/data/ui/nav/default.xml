@@ -1,0 +1,9 @@
+<nav search_view="search" color="#0d9ddb">
+  <view name="evidentio_overview_dashbaord" default='true'/>
+  <view name="search" />
+  <view name="data_models" />
+  <view name="reports" />
+  <view name="alerts" />
+  <view name="dashboards" />
+  <a href="https://esp.evident.io/users/sign_in">Evident.io Login</a>
+</nav>
