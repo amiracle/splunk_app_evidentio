@@ -16,7 +16,7 @@ Reference Material :
 	- http://docs.splunk.com/Documentation/Splunk/6.4.1/Data/UsetheHTTPEventCollector - Setup Splunk HTTP Event Collector 
 	- https://gist.github.com/glennblock/0d5e6384d93449d3e7c6 - Information on how to properly setup props.conf
 
-Here's a list of files that are added to your $SPLUNK_HOME/etc/apps/splunk_app_for_evidentio folder:
+Here's a list of files that are added to your $SPLUNK_HOME/etc/apps/evidentio_app_splunk folder:
 
 	- default/props.conf
 
@@ -24,7 +24,7 @@ Steps to configure your deployment :
 - Step 1 - Download and install the Splunk App for Evident.io from Splunkbase (https://splunkbase.splunk.com/app/3204/)
 - Step 2 - Create HTTP Event Collector (HEC) Token Creation
 
-	- Log into your Splunk instance and click on Settings -> Data Inputs -> HTTP Event Collector.  Click on Create New Token. Name the input "Dome9 Input" then click Next. 
+	- Log into your Splunk instance and click on Settings -> Data Inputs -> HTTP Event Collector.  Click on Create New Token. Name the input "Evident.io Input" then click Next. 
 	
 	- Select the correct source type "aws:evidentio", leave the Default Index as "Default." Click Review, then Submit. 
 	- Copy the Token Value and keep it ready. 
