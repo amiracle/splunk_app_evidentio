@@ -1,4 +1,4 @@
-#Splunk App for Evident.io
+#Evident.io app for Splunk
 
 Splunk Technology Add-on for Evident.io Version 2.0
 
@@ -16,7 +16,7 @@ Reference Material :
 	- http://docs.splunk.com/Documentation/Splunk/6.4.1/Data/UsetheHTTPEventCollector - Setup Splunk HTTP Event Collector 
 	- https://gist.github.com/glennblock/0d5e6384d93449d3e7c6 - Information on how to properly setup props.conf
 
-Here's a list of files that are added to your $SPLUNK_HOME/etc/apps/splunk_app_for_evidentio folder:
+Here's a list of files that are added to your $SPLUNK_HOME/etc/apps/splunk_app_evidentio folder:
 
 	- default/props.conf
 
