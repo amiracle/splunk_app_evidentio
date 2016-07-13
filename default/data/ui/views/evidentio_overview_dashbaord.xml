@@ -1,6 +1,6 @@
 <form>
   <label>Evident.io Overview Dashboard</label>
-  <fieldset submitButton="false">
+  <fieldset submitButton="true">
     <input type="time" token="time">
       <label>Time</label>
       <default>
@@ -26,7 +26,7 @@
       <chart>
         <title>By Resource</title>
         <search>
-          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1  | spath input=message.Records{}.Sns.Message|  search data.attributes.resource = "$resource_type$*" |  rename "included{}.attributes.risk_level" as "Severity" | stats count by Severity</query>
+          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1  | spath input=message.Records{}.Sns.Message|  search data.attributes.resource = "$resource_type$*" |  rename "included{}.attributes.risk_level" as "Severity" | stats count by Severity</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
@@ -59,7 +59,7 @@
       <title>Resource Breakdown</title>
       <table>
         <search>
-          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1   | spath input=message.Records{}.Sns.Message  | rename data.attributes.resource as resource | search resource = "$resource_type$*" | rename included{}.attributes.data.details.attachedEC2Instances{} as Instance | rename included{}.attributes.resolution as Resolution| rename included{}.attributes.data.details.securityGroup.vpcId as VPC | rename included{}.attributes.risk_level as Severity | stats count as "Number of Alerts",values(Instance) as "Associated EC2 Instances" by Severity, resource | sort + Severity</query>
+          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1   | spath input=message.Records{}.Sns.Message  | rename data.attributes.resource as resource | search resource = "$resource_type$*" | rename included{}.attributes.data.details.attachedEC2Instances{} as Instance | rename included{}.attributes.resolution as Resolution| rename included{}.attributes.data.details.securityGroup.vpcId as VPC | rename included{}.attributes.risk_level as Severity | stats count as "Number of Alerts",values(Instance) as "Associated EC2 Instances" by Severity, resource | sort + Severity</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
@@ -68,6 +68,7 @@
         <option name="rowNumbers">false</option>
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">cell</option>
+        <option name="count">10</option>
       </table>
     </panel>
   </row>
@@ -76,8 +77,7 @@
       <title>Resolution</title>
       <table>
         <search>
-          <query>index=main sourcetype=aws:evidentio message.Records{}.Sns.Message &gt; 1    | spath input=message.Records{}.Sns.Message   | rename data.attributes.resource as resource | search resource = $resource_type$ | rename included{}.attributes.resolution as Resolution | table
- Resolution</query>
+          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1    | spath input=message.Records{}.Sns.Message   | rename data.attributes.resource as resource | search resource = $resource_type$ | rename included{}.attributes.resolution as Resolution | table  Resolution</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
