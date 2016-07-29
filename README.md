@@ -20,6 +20,9 @@ Here's a list of files that are added to your $SPLUNK_HOME/etc/apps/splunk_app_e
 
 	- default/props.conf
 
+##Splunk Cloud Customers 
+Contact Support to have the Evident.io App for Splunk installed on your environment.  You will also need to specify in the case that you need to enable the HTTP Event Collector.  They will send you the URL and token that you will need for the following steps. Make sure to specify the sourcetype=aws-evidentio and the index=main.)
+
 Steps to configure your deployment :
 - Step 1 - Download and install the Splunk App for Evident.io from Splunkbase (https://splunkbase.splunk.com/app/3204/)
 - Step 2 - Create HTTP Event Collector (HEC) Token Creation
