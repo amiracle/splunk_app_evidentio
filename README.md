@@ -1,6 +1,6 @@
 #Evident.io app for Splunk
 
-Splunk Technology Add-on for Evident.io Version 2.0
+Splunk Technology Add-on for Evident.io Version 2.1
 
 This Splunk App is for people who have an account with Evident.io (http://www.evident.io) and want to gather their alerts into their on-premis Splunk or Splunk Cloud instance. Unlike the previous version, you will no longer need to have the App for AWS installed in order to pull the data from Evident. This solution will now use an AWS lambda function and the Splunk HTTP Event Collector (HEC). Here is what you will need in order to get this solution up and running in your AWS environment:
 	
@@ -40,7 +40,7 @@ Steps to configure your deployment :
 	- Click on "Create a Lambda function"
 	- In the Filter box, type in "splunk-logging" Click on the result.
 		- Give your Lambda function a name, I would suggest using "GetDataFromEvidentio"
-		-	(Watch this video for additional help setting up the Lambda function with Splunk http://dev.splunk.com/view/event-collector/SP-CAAAE7T) 
+		- (Watch this video for additional help setting up the Lambda function with Splunk http://dev.splunk.com/view/event-collector/SP-CAAAE7T) 
 		- Encrypt your Splunk HEC token using the AWS CLI tools and the KMS key generated per the video. 
 		
 	- With the lambda function setup, now go to your SNS topics and subscribe your newly created lambda function to the topic collecting data from Evident.io.
