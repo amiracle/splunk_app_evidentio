@@ -1,0 +1,118 @@
+<form>
+  <label>Details on Alert</label>
+  <description>Details about Evident.io Alert</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="text" token="resource">
+      <label>Resource</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>index=main sourcetype=aws-evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | mvexpand included{}.attributes.name | rename "included{}.attributes.name" AS "Team and Description" | table "Team and Description" | head 2</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Resource Name</title>
+      <single>
+        <search>
+          <query>*| eval resource="$form.resource$" | table resource</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="height">156</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x65a637","0x6db7c6","0xf7bc38","0xf58f39","0xd93f3c"]</option>
+        <option name="rangeValues">[0,30,70,100]</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">0</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Click the Identifier for the resolution steps</title>
+        <search>
+          <query>index=main sourcetype=aws-evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | rename data.attributes.status AS "Status" data.attributes.risk_level AS "Risk Level" included{}.attributes.data.details.message AS "Details" included{}.attributes.identifier AS "Identifier" | dedup "Identifier" | table "Status" "Risk Level" "Details" "Identifier" | sort "Risk Level"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">cell</option>
+        <format type="number" field="Risk Level"></format>
+        <format type="color" field="Risk Level">
+          <colorPalette type="map">{"medium":#ED8440,"high":#D93F3C,"low":#6DB7C6}</colorPalette>
+        </format>
+        <format type="color" field="Status">
+          <colorPalette type="map">{"fail":#D93F3C,"pass":#65A637,"info":#6DB7C6}</colorPalette>
+        </format>
+        <drilldown>
+          <set token="Identifier">$row.Identifier$</set>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <title>Resolution for $Identifier$</title>
+      <table>
+        <search>
+          <query>index=main sourcetype=aws-evidentio | spath input=Records{}.Sns.Message  | search "included{}.attributes.identifier"="$Identifier$" | rename included{}.attributes.description AS "Description"  included{}.attributes.resolution AS "Resolution" | dedup "Resolution" | table "Description"  "Resolution"</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Raw Event from CloudTrail</title>
+        <search>
+          <query>index=main sourcetype=aws-evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | stats values(included{}.attributes.raw_event.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Value=mvindex(data,-1)  | eval Policy=mvindex(data,4) | table Value Policy Event</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Evident.io Links</title>
+        <search>
+          <query>index=main sourcetype=aws-evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="DucaMigrationTest" | stats values(included{}.relationships.*) | transpose | rename "row 1" AS "Link" | eval data=split(column,".") | eval Value=mvindex(data,2) | table Value Link</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+    <panel>
+      <table>
+        <title>Details for Resource</title>
+        <search>
+          <query>index=main sourcetype=aws-evidentio   source="http:Evident.io" | spath input=Records{}.Sns.Message | search"data.attributes.resource"="$form.resource$"  | stats values(included{}.attributes.data.details.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Bucket_Data=mvindex(data,1)  | eval Policy=mvindex(data,4) | table  Policy Event</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+</form>
