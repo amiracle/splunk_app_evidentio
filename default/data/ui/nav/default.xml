@@ -6,4 +6,5 @@
   <view name="alerts" />
   <view name="dashboards" />
   <a href="https://esp.evident.io/users/sign_in">Evident.io Login</a>
+  <a href="http://docs.evident.io/#splunk">Evident.io Docs</a>
 </nav>

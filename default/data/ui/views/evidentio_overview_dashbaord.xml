@@ -1,91 +1,128 @@
 <form>
   <label>Evident.io Overview Dashboard</label>
-  <fieldset submitButton="true">
-    <input type="time" token="time">
+  <fieldset submitButton="true" autoRun="true">
+    <input type="time" token="time" searchWhenChanged="true">
       <label>Time</label>
       <default>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </default>
     </input>
-    <input type="dropdown" token="resource_type" searchWhenChanged="true">
-      <label>Resource Type</label>
+    <input type="multiselect" token="aws_account" searchWhenChanged="true">
+      <label>Account</label>
+      <fieldForLabel>included{}.attributes.account</fieldForLabel>
+      <fieldForValue>included{}.attributes.account</fieldForValue>
+      <search>
+        <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by "included{}.attributes.account"</query>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </search>
+      <delimiter> </delimiter>
       <choice value="*">All</choice>
-      <choice value="vol*">Volume</choice>
-      <choice value="vpc*">VPC</choice>
-      <choice value="i*">Instance</choice>
-      <choice value="acl*">ACL</choice>
-      <choice value="subnet*">Subnet</choice>
-      <choice value="sg*">Security Group</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+    <input type="dropdown" token="risk_level" searchWhenChanged="true">
+      <label>Risk Level</label>
+      <choice value="*">All</choice>
+      <choice value="low">Low</choice>
+      <choice value="medium">Medium</choice>
+      <choice value="high">High</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="status" searchWhenChanged="true">
+      <label>Status</label>
+      <fieldForLabel>data.attributes.status</fieldForLabel>
+      <fieldForValue>data.attributes.status</fieldForValue>
+      <search>
+        <query>index=main sourcetype=aws-evidentio source="http:Evident.io"   | spath input=Records{}.Sns.Message | stats count by data.attributes.status</query>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </search>
+      <choice value="*">All</choice>
+      <initialValue>*</initialValue>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="region" searchWhenChanged="true">
+      <label>Region</label>
+      <fieldForLabel>included{}.attributes.code</fieldForLabel>
+      <fieldForValue>included{}.attributes.code</fieldForValue>
+      <search>
+        <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by  "included{}.attributes.code"</query>
+        <earliest>-60m@m</earliest>
+        <latest>now</latest>
+      </search>
+      <choice value="*">All</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="filter" searchWhenChanged="true">
+      <label>Filter</label>
+      <choice value="*">All</choice>
+      <prefix>*</prefix>
+      <suffix>*</suffix>
+      <initialValue>*</initialValue>
+      <fieldForLabel>service</fieldForLabel>
+      <fieldForValue>service</fieldForValue>
+      <search>
+        <query>index=main sourcetype=aws-evidentio Records{}.Sns.Message &gt; 1 | spath input=Records{}.Sns.Message  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" |  rename included{}.attributes.identifier AS identifier | stats count by service</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
       <default>*</default>
     </input>
   </fieldset>
   <row>
     <panel>
-      <title>Severity Breakdown</title>
-      <chart>
-        <title>By Resource</title>
+      <title>Regions</title>
+      <single>
         <search>
-          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1  | spath input=message.Records{}.Sns.Message|  search data.attributes.resource = "$resource_type$*" |  rename "included{}.attributes.risk_level" as "Severity" | stats count by Severity</query>
+          <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.status=$status$ data.attributes.risk_level=$risk_level$ | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | bucket data.attributes.risk_level span=15m  | stats count by included{}.attributes.code</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
-        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
-        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
-        <option name="charting.axisTitleX.visibility">visible</option>
-        <option name="charting.axisTitleY.visibility">visible</option>
-        <option name="charting.axisTitleY2.visibility">visible</option>
-        <option name="charting.axisX.scale">linear</option>
-        <option name="charting.axisY.scale">linear</option>
-        <option name="charting.axisY2.enabled">0</option>
-        <option name="charting.axisY2.scale">inherit</option>
-        <option name="charting.chart">pie</option>
-        <option name="charting.chart.bubbleMaximumSize">50</option>
-        <option name="charting.chart.bubbleMinimumSize">10</option>
-        <option name="charting.chart.bubbleSizeBy">area</option>
-        <option name="charting.chart.nullValueMode">gaps</option>
-        <option name="charting.chart.showDataLabels">none</option>
-        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
-        <option name="charting.chart.stackMode">default</option>
-        <option name="charting.chart.style">shiny</option>
-        <option name="charting.drilldown">all</option>
-        <option name="charting.layout.splitSeries">0</option>
-        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
-        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
-        <option name="charting.legend.placement">right</option>
-      </chart>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="useColors">1</option>
+      </single>
     </panel>
     <panel>
-      <title>Resource Breakdown</title>
-      <table>
+      <title>Resources by Status</title>
+      <single>
         <search>
-          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1   | spath input=message.Records{}.Sns.Message  | rename data.attributes.resource as resource | search resource = "$resource_type$*" | rename included{}.attributes.data.details.attachedEC2Instances{} as Instance | rename included{}.attributes.resolution as Resolution| rename included{}.attributes.data.details.securityGroup.vpcId as VPC | rename included{}.attributes.risk_level as Severity | stats count as "Number of Alerts",values(Instance) as "Associated EC2 Instances" by Severity, resource | sort + Severity</query>
+          <query>index=main sourcetype=aws-evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | rename data.attributes.resource AS resource | stats count(data.attributes.status) by "resource"</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
-        <option name="charting.chart">bar</option>
-        <option name="wrap">true</option>
-        <option name="rowNumbers">false</option>
-        <option name="dataOverlayMode">none</option>
-        <option name="drilldown">cell</option>
-        <option name="count">10</option>
-      </table>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.size">small</option>
+        <option name="trellis.splitBy">data.attributes.resource</option>
+        <option name="underLabel">Risks</option>
+        <option name="useColors">1</option>
+        <drilldown>
+          <link target="_blank">/app/splunk_app_evidentio/details_on_alert?form.resource=$trellis.value$</link>
+        </drilldown>
+      </single>
     </panel>
-  </row>
-  <row>
     <panel>
-      <title>Resolution</title>
+      <title>Service Breakdown</title>
       <table>
         <search>
-          <query>index=main sourcetype=aws-evidentio message.Records{}.Sns.Message &gt; 1    | spath input=message.Records{}.Sns.Message   | rename data.attributes.resource as resource | search resource = $resource_type$ | rename included{}.attributes.resolution as Resolution | table  Resolution</query>
+          <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message  |  search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ |  rename included{}.attributes.identifier AS identifier, data.attributes.resource AS resource | stats count by service, identifier, resource | sort -count</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
-        <option name="wrap">true</option>
-        <option name="rowNumbers">false</option>
+        <option name="count">10</option>
         <option name="dataOverlayMode">none</option>
         <option name="drilldown">cell</option>
-        <option name="count">10</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <link target="_blank">/app/splunk_app_evidentio/details_on_alert?form.resource=$row.resource$</link>
+        </drilldown>
       </table>
     </panel>
   </row>
