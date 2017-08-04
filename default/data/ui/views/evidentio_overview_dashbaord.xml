@@ -13,7 +13,7 @@
       <fieldForLabel>included{}.attributes.account</fieldForLabel>
       <fieldForValue>included{}.attributes.account</fieldForValue>
       <search>
-        <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by "included{}.attributes.account"</query>
+        <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by "included{}.attributes.account"</query>
         <earliest>-60m@m</earliest>
         <latest>now</latest>
       </search>
@@ -35,7 +35,7 @@
       <fieldForLabel>data.attributes.status</fieldForLabel>
       <fieldForValue>data.attributes.status</fieldForValue>
       <search>
-        <query>index=main sourcetype=aws-evidentio source="http:Evident.io"   | spath input=Records{}.Sns.Message | stats count by data.attributes.status</query>
+        <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio source="http:Evident.io"   | spath input=Records{}.Sns.Message | stats count by data.attributes.status</query>
         <earliest>-60m@m</earliest>
         <latest>now</latest>
       </search>
@@ -48,7 +48,7 @@
       <fieldForLabel>included{}.attributes.code</fieldForLabel>
       <fieldForValue>included{}.attributes.code</fieldForValue>
       <search>
-        <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by  "included{}.attributes.code"</query>
+        <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message | stats count by  "included{}.attributes.code"</query>
         <earliest>-60m@m</earliest>
         <latest>now</latest>
       </search>
@@ -64,7 +64,7 @@
       <fieldForLabel>service</fieldForLabel>
       <fieldForValue>service</fieldForValue>
       <search>
-        <query>index=main sourcetype=aws-evidentio Records{}.Sns.Message &gt; 1 | spath input=Records{}.Sns.Message  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" |  rename included{}.attributes.identifier AS identifier | stats count by service</query>
+        <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio  Records{}.Sns.Message &gt; 1 | spath input=Records{}.Sns.Message  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" |  rename included{}.attributes.identifier AS identifier | stats count by service</query>
         <earliest>-24h@h</earliest>
         <latest>now</latest>
       </search>
@@ -76,7 +76,7 @@
       <title>Regions</title>
       <single>
         <search>
-          <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.status=$status$ data.attributes.risk_level=$risk_level$ | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | bucket data.attributes.risk_level span=15m  | stats count by included{}.attributes.code</query>
+          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.status=$status$ data.attributes.risk_level=$risk_level$ | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | bucket data.attributes.risk_level span=15m  | stats count by included{}.attributes.code</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
@@ -91,7 +91,7 @@
       <title>Resources by Status</title>
       <single>
         <search>
-          <query>index=main sourcetype=aws-evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | rename data.attributes.resource AS resource | stats count(data.attributes.status) by "resource"</query>
+          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message| search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ | rename data.attributes.resource AS resource | stats count(data.attributes.status) by "resource"</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
@@ -111,7 +111,7 @@
       <title>Service Breakdown</title>
       <table>
         <search>
-          <query>index=main sourcetype=aws-evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message  |  search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ |  rename included{}.attributes.identifier AS identifier, data.attributes.resource AS resource | stats count by service, identifier, resource | sort -count</query>
+          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio source="http:Evident.io" | spath input=Records{}.Sns.Message  |  search data.attributes.risk_level=$risk_level$ included{}.attributes.code=$region$ included{}.attributes.account=$aws_account$ data.attributes.status=$status$  | rex field=included{}.attributes.identifier "\w+:(?&lt;service&gt;[^-]+)-" | search $filter$ |  rename included{}.attributes.identifier AS identifier, data.attributes.resource AS resource | stats count by service, identifier, resource | sort -count</query>
           <earliest>$time.earliest$</earliest>
           <latest>$time.latest$</latest>
         </search>
