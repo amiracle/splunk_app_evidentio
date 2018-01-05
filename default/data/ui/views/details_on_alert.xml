@@ -10,7 +10,7 @@
     <panel>
       <table>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | mvexpand included{}.attributes.name | rename "included{}.attributes.name" AS "Team and Description" | table "Team and Description" | head 2</query>
+          <query>`esp_alerts`  | search "data.attributes.resource"="$form.resource$" | mvexpand included{}.attributes.name | rename "included{}.attributes.name" AS "Team and Description" | table "Team and Description" | head 2</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -51,7 +51,7 @@
       <table>
         <title>Click the Identifier for the resolution steps</title>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | rename data.attributes.status AS "Status" data.attributes.risk_level AS "Risk Level" included{}.attributes.data.details.message AS "Details" included{}.attributes.identifier AS "Identifier" | dedup "Identifier" | table "Status" "Risk Level" "Details" "Identifier" | sort "Risk Level"</query>
+          <query>`esp_alerts`  | search "data.attributes.resource"="$form.resource$" | rename data.attributes.status AS "Status" data.attributes.risk_level AS "Risk Level" included{}.attributes.data.details.message AS "Details" included{}.attributes.identifier AS "Identifier" | dedup "Identifier" | table "Status" "Risk Level" "Details" "Identifier" | sort "Risk Level"</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -72,7 +72,7 @@
       <title>Resolution for $Identifier$</title>
       <table>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio | spath input=Records{}.Sns.Message  | search "included{}.attributes.identifier"="$Identifier$" | rename included{}.attributes.description AS "Description"  included{}.attributes.resolution AS "Resolution" | dedup "Resolution" | table "Description"  "Resolution"</query>
+          <query>`esp_alerts`  | search "included{}.attributes.identifier"="$Identifier$" | rename included{}.attributes.description AS "Description"  included{}.attributes.resolution AS "Resolution" | dedup "Resolution" | table "Description"  "Resolution"</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -85,7 +85,7 @@
       <table>
         <title>Raw Event from CloudTrail</title>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="$form.resource$" | stats values(included{}.attributes.raw_event.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Value=mvindex(data,-1)  | eval Policy=mvindex(data,4) | table Value Policy Event</query>
+          <query>`esp_alerts`  | search "data.attributes.resource"="$form.resource$" | stats values(included{}.attributes.raw_event.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Value=mvindex(data,-1)  | eval Policy=mvindex(data,4) | table Value Policy Event</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -96,7 +96,7 @@
       <table>
         <title>Evident.io Links</title>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio | spath input=Records{}.Sns.Message  | search "data.attributes.resource"="DucaMigrationTest" | stats values(included{}.relationships.*) | transpose | rename "row 1" AS "Link" | eval data=split(column,".") | eval Value=mvindex(data,2) | table Value Link</query>
+          <query>`esp_alerts`  | search "data.attributes.resource"="DucaMigrationTest" | stats values(included{}.relationships.*) | transpose | rename "row 1" AS "Link" | eval data=split(column,".") | eval Value=mvindex(data,2) | table Value Link</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
@@ -107,7 +107,7 @@
       <table>
         <title>Details for Resource</title>
         <search>
-          <query>index=main sourcetype=aws-evidentio OR sourcetype=aws:evidentio  source="http:Evident.io" | spath input=Records{}.Sns.Message | search"data.attributes.resource"="$form.resource$"  | stats values(included{}.attributes.data.details.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Bucket_Data=mvindex(data,1)  | eval Policy=mvindex(data,4) | table  Policy Event</query>
+          <query>`esp_alerts` | search"data.attributes.resource"="$form.resource$"  | stats values(included{}.attributes.data.details.*) | transpose | rename "row 1" AS "Event" | eval data=split(column,".") | eval Bucket_Data=mvindex(data,1)  | eval Policy=mvindex(data,4) | table  Policy Event</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>

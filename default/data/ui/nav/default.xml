@@ -1,5 +1,5 @@
 <nav search_view="search" color="#0d9ddb">
-  <view name="evidentio_overview_dashbaord" default='true'/>
+  <view name="evidentio_overview" default='true'/>
   <view name="search" />
   <view name="data_models" />
   <view name="reports" />
