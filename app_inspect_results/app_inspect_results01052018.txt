@@ -1,0 +1,22 @@
+cisco-ds3-office:GitHub kamiloamir$ /Users/kamiloamir/venv/bin/./splunk-appinspect inspect /Users/kamiloamir/Documents/GitHub/splunk_app_evidentio-1.2.2.tar.gz
+Validating: splunk_app_evidentio Version: 1.2.2
+.......................................................................
+....................................................................
+.....................................
+
+
+
+splunk_app_evidentio Report Summary:
+
+       skipped:  0
+       success: 87
+  manual_check: 22
+       failure:  0
+       warning:  0
+         error:  0
+not_applicable: 89
+-------------------
+         Total: 198
+
+
+cisco-ds3-office:GitHub kamiloamir$ pwd
