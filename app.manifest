@@ -5,7 +5,7 @@
     "id": {
       "group": null, 
       "name": "splunk_app_evidentio", 
-      "version": "1.2.4"
+      "version": "1.2.5"
     }, 
     "author": [
       {
