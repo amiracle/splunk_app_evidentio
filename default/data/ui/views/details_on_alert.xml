@@ -96,7 +96,7 @@
       <table>
         <title>Evident.io Links</title>
         <search>
-          <query>`esp_alerts`  | search "data.attributes.resource"="DucaMigrationTest" | stats values(included{}.relationships.*) | transpose | rename "row 1" AS "Link" | eval data=split(column,".") | eval Value=mvindex(data,2) | table Value Link</query>
+          <query>`esp_alerts`  | search "data.attributes.resource"="$form.resource$" | stats values(included{}.relationships.*) | transpose | rename "row 1" AS "Link" | eval data=split(column,".") | eval Value=mvindex(data,2) | table Value Link</query>
           <earliest>-24h@h</earliest>
           <latest>now</latest>
         </search>
